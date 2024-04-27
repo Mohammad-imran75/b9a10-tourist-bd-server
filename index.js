@@ -1,9 +1,13 @@
+require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
-const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
-require("dotenv").config();
+
+const cors = require("cors");
+const app = express();
+
+
+
 app.use(cors());
 app.use(express.json());
 
@@ -42,7 +46,7 @@ async function run() {
       const result = await touristSpotCollection.insertOne(visitor);
       res.send(result);
     });
-    await client.connect();
+    
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
