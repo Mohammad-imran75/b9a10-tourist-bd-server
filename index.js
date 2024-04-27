@@ -7,8 +7,7 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 
-const uri =
-  `mongodb+srv://${process.env.SECRET_NAME}:${process.env.SECRET_KEY}@cluster0.6f8slkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.SECRET_NAME}:${process.env.SECRET_KEY}@cluster0.6f8slkt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -22,19 +21,27 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    const touristSpotCollection = client.db("touristDB").collection('spot')
-    app.get('/touristSpots',async(req,res)=>{
-       const cursor = touristSpotCollection.find()
-       const result = await cursor.toArray()
-       res.send(result);
+    const touristSpotCollection = client.db("touristDB").collection("spot");
+    app.get("/touristSpots", async (req, res) => {
+      const cursor = touristSpotCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    app.get('/touristSpot', async (req, res) => {
+      let query = {};
+      if (req.query?.email) {
+        query = { sellerEmail: req.query?.email }
+      }
+     
+      const result = await touristSpotCollection.find(query).toArray();
+      res.send(result)
     })
-    app.post('/touristSpots',async(req,res)=>{
-        const visitor = req.body;
-        console.log(visitor)
-        const result = await touristSpotCollection
-        .insertOne(visitor);
-        res.send(result)
-    })
+    app.post("/touristSpots", async (req, res) => {
+      const visitor = req.body;
+      console.log(visitor);
+      const result = await touristSpotCollection.insertOne(visitor);
+      res.send(result);
+    });
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
